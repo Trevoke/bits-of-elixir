@@ -1,0 +1,66 @@
+#+OPTIONS: reveal_single_file:t toc:nil reveal_title_slide:nil H:3 num:nil
+#+REVEAL_HLEVEL: 1
+#+REVEAL_THEME: solarized
+
+* Elixir!
+* Fundamentals
+** Functional
+- Lists, *not* Arrays!
+- Immutability
+** Functional
+#+begin_src elixir
+  a = [1,2,3]
+  a = [0 | a] # => [0,1,2,3]
+  b = %{intro: 1, elixir: 2}
+#+end_src
+** Functional
+#+begin_src elixir
+  a = [1,2,3,4]
+  Enum.member?(a, 2) # => true
+  Enum.map(a, fn(x) -> x + 1 end) # => [2,3,4,5]
+  Enum.map(a, &(&1+1)) # => same
+#+end_src
+Note: this does NOT modify ~a~!
+** Actor pattern
+Fully segregated Erlang processes:
+- State isn't shared
+- easy to make distributed systems
+** Actor Pattern
+#+begin_src elixir
+  defmodule MyServer do
+    use GenServer
+  end
+
+  {:ok, server} = GenServer.start_link(MyServer, nil)
+#+end_src
+** Supervision tree
+#+begin_src elixir
+  defmodule Ecstatic.Supervisor do
+    use Supervisor
+    # [...]
+    def init(_arg) do
+      children = [
+        {Ecstatic.Store.Ets, []},
+        {Ecstatic.EventSource, []},
+        {Ecstatic.EventProducer, []}
+      ]
+
+      Supervisor.init(children, strategy: :one_for_one)
+    end
+  end
+#+end_src
+* Cool things
+** Project management tool
+~mix~ (see more during demo)
+** Tests and Documentation
+Community inherited this from Ruby
+** The pipe operator
+#+begin_src elixir
+  require Integer
+
+  a = [1,2,3,4]
+  Enum.flat_map(a, fn(x) -> [x,x+1] end)
+  |> Enum.filter(fn(x) -> Integer.is_even(x) end)
+  |> Enum.map(fn(x) -> x - 1 end)
+  # => [1,1,3,3]
+#+end_src
